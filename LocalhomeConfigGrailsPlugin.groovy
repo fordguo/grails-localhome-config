@@ -1,10 +1,13 @@
+import grails.plugins.localhome.LocalConfigUtil
+
 class LocalConfigGrailsPlugin {
     // the plugin version
     def version = "0.1"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.1 > *"
+    def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
+	def loadAfter = ['i18n']
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
         "grails-app/views/error.gsp"
@@ -12,20 +15,20 @@ class LocalConfigGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Local Config Plugin" // Headline display name of the plugin
-    def author = "Your name"
+    def author = "Ford Guo"
     def authorEmail = ""
     def description = '''\
-Brief summary/description of the plugin.
+Configure the external configuration in ~/.grails/appName/files(Config.groovy,DataSource.groovy)
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/local-config"
+    def documentation = "http://grails.org/plugin/localhome-config"
 
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
-
+    def license = "APACHE"
+    
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
 
@@ -36,14 +39,13 @@ Brief summary/description of the plugin.
 //    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/fordguo/grails-localhome-config" ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -52,6 +54,12 @@ Brief summary/description of the plugin.
 
     def doWithApplicationContext = { applicationContext ->
         // TODO Implement post initialization spring config (optional)
+        println LocalConfigUtil.checkHomeFiles(grailsApplication)
+        def messageSource = applicationContext.getBean("messageSource")
+        if (messageSource) {
+            def basenames = messageSource.basenames
+            println basenames
+        }
     }
 
     def onChange = { event ->
