@@ -15,7 +15,11 @@ class LocalhomeConfigGrailsPlugin {
 	def loadAfter = ['i18n']
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+        "grails-app/views/error.gsp",
+        "grails-app/views/test/*.gsp",
+        "grails-app/controllers/localhome/config/TestController.groovy",
+        "web-app/images/*",
+        "grails-app/i18n/*"
     ]
 
     // TODO Fill in these fields
