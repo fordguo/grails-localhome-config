@@ -2,6 +2,7 @@ import grails.plugins.localhome.LocalConfigUtil
 import grails.plugins.localhome.BasenamesUtils
 
 import org.codehaus.groovy.grails.context.support.PluginAwareResourceBundleMessageSource
+import org.springframework.context.support.ReloadableResourceBundleMessageSource
 
 import org.apache.commons.io.FileUtils
 
@@ -27,7 +28,7 @@ class LocalhomeConfigGrailsPlugin {
     def author = "Ford Guo"
     def authorEmail = ""
     def description = '''\
-Configure the external configuration in ~/.grails/appName/files(Config.groovy,DataSource.groovy)
+Configure the external configuration in ~/.grails/appName/files(Config.groovy,grails-app/i18n,web-app/)
 '''
 
     // URL to the plugin's documentation
@@ -55,42 +56,17 @@ Configure the external configuration in ~/.grails/appName/files(Config.groovy,Da
     }
 
     def doWithSpring = {
-        println "doWithSpring"
-        def i18nNames = LocalConfigUtil.checkI18nNames(application)
-        if (manager?.hasGrailsPlugin("i18n") && i18nNames) {
-            def i18nPlugin = manager.getGrailsPlugin("i18n")
-            def messageResources
-            if (application.warDeployed) {
-                messageResources = parentCtx?.getResources("**/WEB-INF/${baseDir}/**/*.properties")?.toList()
-            } else {
-                messageResources = i18nPlugin.watchedResources
-            }
-            if (messageResources) {
-                BasenamesUtils.i18nCode(messageResources,baseNames)
-            }
-        }
-        messageSource(PluginAwareResourceBundleMessageSource) {
-            basenames = ((baseNames as List)+ (i18nNames as List)).toArray()
-            fallbackToSystemLocale = false
-            pluginManager = manager
-            grailsApplication = application
-        }
     }
     def doWithDynamicMethods = { ctx ->
-        println "doWithDynamicMethods"
         // TODO Implement registering dynamic methods to classes (optional)
     }
 
     def doWithApplicationContext = { applicationContext ->
-        println "doWithApplicationContext"
         def i18nNames = LocalConfigUtil.checkI18nNames(application)
         def messageSource = applicationContext.getBean("messageSource")
         if (messageSource) {
             messageSource.basenames = ((baseNames as List)+ (i18nNames as List)).toArray()
             messageSource.clearCache() 
-            messageSource.clearCacheIncludingAncestors()
-            println messageSource.getMessage('a',null,Locale.CHINA) 
-            println "messageSource:${messageSource}"
         }
         def webappFiles = LocalConfigUtil.checkWebappFiles(application)
         def servletContext = application.getParentContext().getServletContext()
@@ -99,7 +75,7 @@ Configure the external configuration in ~/.grails/appName/files(Config.groovy,Da
             int idx = from.absolutePath.indexOf(startStr)+startStr.size()
             def resPath = from.absolutePath[idx..-1]
             def to = new File(servletContext.getRealPath(resPath))
-            if (from.lastModified() != to.lastModified()) {
+            if (to.exists() && from.lastModified() != to.lastModified()) {
                 FileUtils.copyFile(from,to,true)
             }
         }
