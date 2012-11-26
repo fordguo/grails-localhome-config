@@ -1,2 +1,6 @@
 target
 grails-localhome*.zip
+web-app/
+*.log
+plugin.xml
+.settings
