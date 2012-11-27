@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 
 class LocalhomeConfigGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.2 > *"
     // the other plugins this plugin depends on
@@ -63,8 +63,20 @@ Configure the external configuration in ~/.grails/appName/files(Config.groovy,gr
 
     def doWithApplicationContext = { applicationContext ->
         def i18nNames = LocalConfigUtil.checkI18nNames(application)
+        if (manager?.hasGrailsPlugin("i18n") && i18nNames) {
+            def i18nPlugin = manager.getGrailsPlugin("i18n")
+            def messageResources
+            if (application.warDeployed) {
+                messageResources = parentCtx?.getResources("**/WEB-INF/${BasenamesUtils.baseDir}/**/*.properties")?.toList()
+            } else {
+                messageResources = i18nPlugin.watchedResources
+            }
+            if (messageResources) {
+                BasenamesUtils.i18nCode(messageResources,baseNames)
+            }
+        }
         def messageSource = applicationContext.getBean("messageSource")
-        if (messageSource) {
+        if (messageSource && i18nNames) {
             messageSource.basenames = ((baseNames as List)+ (i18nNames as List)).toArray()
             messageSource.clearCache() 
         }
