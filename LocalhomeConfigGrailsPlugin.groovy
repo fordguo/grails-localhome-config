@@ -45,7 +45,7 @@ class LocalhomeConfigGrailsPlugin {
         }
         def messageSource = applicationContext.getBean("messageSource")
         if (messageSource && i18nNames) {
-            messageSource.basenames = ((baseNames as List)+ (i18nNames as List)).toArray()
+            messageSource.basenames = ((i18nNames as List) + (baseNames as List)).toArray()
             messageSource.clearCache() 
         }
         def webappFiles = LocalConfigUtil.checkWebappFiles(application)

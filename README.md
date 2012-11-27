@@ -9,6 +9,7 @@ All the customized content will be put into local user home directory
 
 ### I18n properties
 The i18n files will be in local user home's *grails-app/i18n* directory,the plugins will add the home i18n properties into the **messageSource** bean.
+
 Note:**the properties should be encoded as UTF-8**
 
 ### Web-app resources
